@@ -1,29 +1,29 @@
-#define ARDUINO_ARCH_AVR
+// #define ARDUINO_ARCH_AVR
 
 // For OLED LCD
 #define I2C_SDA SDA
 #define I2C_SCL SCL
 
 // GPS
-#define GPS_RX_PIN RX
+#define GPS_RX_PIN PIN_SERIAL1_RX
 
 // #define BUTTON_PIN 32 // D
 // #define BUTTON_NEED_PULLUP
 
-#define LORA_DIO0 14 // IRQ E
-#define LORA_RESET 33 // B
-#define LORA_DIO1 27 // A
-#define LORA_DIO2 A5 // F
+#define LORA_DIO0 D5   // IRQ E
+#define LORA_RESET D10 // B
+#define LORA_DIO1 D11  // A
+#define LORA_DIO2 D25  // F
 // #define LORA_DIO3
 
 // Not sure if these are needed on RF95W
-// #define LORA_RXEN 14 
+// #define LORA_RXEN 14
 // #define LORA_TXEN 13
 
 #define LORA_SCK SCK
 #define LORA_MISO MISO
 #define LORA_MOSI MOSI
-#define LORA_CS 15
+#define LORA_CS D9
 
 // RX/TX for RFM95/SX127x
 // #define RF95_RXEN LORA_RXEN
@@ -45,8 +45,8 @@
 // #define USE_LLCC68
 // #define USE_SH1107_128_64
 
-#define BATTERY_PIN BATT_MONITOR
-// #define BATTERY_SENSE_SAMPLES 1
+#define BATTERY_PIN A0
+#define BATTERY_SENSE_RESOLUTION_BITS ADC_RESOLUTION
 #define ADC_CHANNEL ADC1_GPIO35_CHANNEL
 #define ADC_MULTIPLIER 2
 #define BAT_FULLVOLT 4200

@@ -1,0 +1,33 @@
+// For OLED LCD and I2C sensors
+#define I2C_SDA PIN_WIRE_SDA
+#define I2C_SCL PIN_WIRE_SCL
+#define HAS_SCREEN 0
+
+// GPS
+#define GPS_RX_PIN PIN_SERIAL1_RX
+
+#define BUTTON_PIN PIN_BUTTON1
+#define PIN_LED1 PIN_RED
+#define PIN_LED2 PIN_BLUE
+
+#define LORA_DIO0 D5   // IRQ E
+#define LORA_RESET D10 // B
+#define LORA_DIO1 D11  // A
+#define LORA_DIO2 A5   // F
+
+#define LORA_SCK SCK
+#define LORA_MISO MISO
+#define LORA_MOSI MOSI
+#define LORA_CS D9
+
+#define SX126X_CS LORA_CS
+#define SX126X_DIO1 LORA_DIO1
+#define SX126X_BUSY LORA_DIO2
+#define SX126X_RESET LORA_RESET
+
+#define USE_RF95
+#define USE_SX1262
+
+#define BATTERY_PIN A6
+#define BATTERY_SENSE_RESOLUTION_BITS ADC_RESOLUTION
+#define ADC_MULTIPLIER 2

@@ -58,7 +58,7 @@
 SerialModule *serialModule;
 SerialModuleRadio *serialModuleRadio;
 
-#if defined(TTGO_T_ECHO) || defined(CANARYONE)
+#if defined(TTGO_T_ECHO) || defined(CANARYONE) || defined(FEATHERNRF52840)
 SerialModule::SerialModule() : StreamAPI(&Serial), concurrency::OSThread("SerialModule") {}
 static Print *serialPrint = &Serial;
 #else
@@ -145,7 +145,7 @@ int32_t SerialModule::runOnce()
                 Serial.begin(baud);
                 Serial.setTimeout(moduleConfig.serial.timeout > 0 ? moduleConfig.serial.timeout : TIMEOUT);
             }
-#elif !defined(TTGO_T_ECHO) && !defined(CANARYONE)
+#elif !defined(TTGO_T_ECHO) && !defined(CANARYONE) && !defined(FEATHERNRF52840)
             if (moduleConfig.serial.rxd && moduleConfig.serial.txd) {
 #ifdef ARCH_RP2040
                 Serial2.setFIFOSize(RX_BUFFER);
@@ -198,7 +198,7 @@ int32_t SerialModule::runOnce()
                     }
                 }
             }
-#if !defined(TTGO_T_ECHO) && !defined(CANARYONE)
+#if !defined(TTGO_T_ECHO) && !defined(CANARYONE) && !defined(FEATHERNRF52840)
             else {
                 while (Serial2.available()) {
                     serialPayloadSize = Serial2.readBytes(serialBytes, meshtastic_Constants_DATA_PAYLOAD_LEN);
