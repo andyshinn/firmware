@@ -2,12 +2,12 @@
 #define I2C_SDA SDA
 #define I2C_SCL SCL
 
-#define LORA_DIO0 D0 // F0
+#define LORA_DIO0 D0  // F0
 #define LORA_RESET G1 // F4
-#define LORA_DIO1 G2 // F5
-#define LORA_DIO2 G3 // F6
+#define LORA_DIO1 G2  // F5
+#define LORA_DIO2 G3  // F6
 
-#define LORA_RXEN G0 // F3
+#define LORA_RXEN G0   // F3
 #define LORA_TXEN PWM0 // F2
 #define LORA_SCK SCK
 #define LORA_MISO MISO
@@ -33,4 +33,4 @@
 #define HAS_SCREEN 0
 
 // There is no battery monitor pin on the MicroMod main boards
-#undef HAS_TELEMETRY
+#define MESHTASTIC_EXCLUDE_POWER_TELEMETRY 1
