@@ -58,6 +58,7 @@ static const uint8_t SCK = 33;
 #define PIN_VBAT WB_A0
 #define BATTERY_PIN PIN_VBAT
 #define ADC_CHANNEL ADC1_GPIO36_CHANNEL
+#define ADC_MULTIPLIER 1.65
 
 // https://docs.rakwireless.com/Product-Categories/WisBlock/RAK13300/
 
@@ -86,3 +87,4 @@ static const uint8_t SCK = 33;
 // DIO2 controlls an antenna switch and the TCXO voltage is controlled by DIO3
 #define SX126X_DIO2_AS_RF_SWITCH
 #define SX126X_DIO3_TCXO_VOLTAGE 1.8
+#define SX126X_ANT_SW WB_IO2
