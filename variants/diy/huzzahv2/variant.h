@@ -4,19 +4,21 @@
 
 // GPS
 #define GPS_RX_PIN RX
+#define GPS_TX_PIN TX
+#define PIN_GPS_STANDBY 26
 
 // #define BUTTON_PIN 32 // D
 // #define BUTTON_NEED_PULLUP
 
-#define LORA_DIO0 14 // IRQ E
+#define LORA_DIO0 12  // IRQ E
 #define LORA_RESET 33 // B
-#define LORA_DIO1 27 // A
-#define LORA_DIO2 A5 // F
+#define LORA_DIO1 27  // A
+#define LORA_DIO2 13  // F
 // #define LORA_DIO3
 
 // Not sure if these are needed on RF95W
-// #define LORA_RXEN 14 
-// #define LORA_TXEN 13
+#define LORA_RXEN 14
+#define LORA_TXEN 32
 
 #define LORA_SCK SCK
 #define LORA_MISO MISO
@@ -24,8 +26,8 @@
 #define LORA_CS 15
 
 // RX/TX for RFM95/SX127x
-// #define RF95_RXEN LORA_RXEN
-// #define RF95_TXEN LORA_TXEN
+#define RF95_RXEN LORA_RXEN
+#define RF95_TXEN LORA_TXEN
 // #define RF95_TCXO <GPIO#>
 
 // common pinouts for SX126X modules
