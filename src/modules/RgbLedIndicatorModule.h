@@ -5,6 +5,8 @@
 
 #ifdef HAS_NEOPIXEL
 #include <graphics/NeoPixel.h>
+// Use the global pixels object from AmbientLightingThread
+extern Adafruit_NeoPixel pixels;
 // Define NeoPixel constants if we have NeoPixel support
 #ifndef NEOPIXEL_TYPE_DEFAULT
 #define NEOPIXEL_TYPE_DEFAULT (NEO_GRB + NEO_KHZ800)
@@ -27,10 +29,12 @@
  * - Yellow: Telemetry (TELEMETRY_APP)
  * - Purple: Audio and detection sensor (AUDIO_APP, DETECTION_SENSOR_APP)
  * - Cyan: Serial and range test (SERIAL_APP, RANGE_TEST_APP)
+ * - Orange/Amber: Duplicate packets (detected via PacketHistory)
  * - White: Unknown or other port numbers
  *
  * Uses the shared global NeoPixel object from AmbientLightingThread.
  * Temporarily overrides ambient lighting when indicating packets.
+ * Inherits from PacketHistory to reuse Meshtastic's duplicate detection.
  */
 class RgbLedIndicatorModule : public MeshModule, public concurrency::OSThread
 {
@@ -58,12 +62,13 @@ class RgbLedIndicatorModule : public MeshModule, public concurrency::OSThread
     uint32_t blinkDuration = 500; // ms
     uint8_t brightness = 255;     // 1-255
     bool firstTime = true;
+    uint32_t blinkStartTime = 0; // Track when blink started
 
     // LED state tracking
     bool ledActive = false;
     uint32_t ledOffTime = 0;
     uint32_t currentColor = 0;
-    uint32_t savedAmbientColor = 0; // Store ambient color to restore later
+    uint32_t savedAmbientColor[10]; // Store ambient colors for each LED (max 10)
 
     /** Set NeoPixel color (32-bit RGB color) */
     void setPixelColor(uint32_t color);
@@ -91,6 +96,13 @@ class RgbLedIndicatorModule : public MeshModule, public concurrency::OSThread
 
     /** Restore ambient lighting state */
     void restoreAmbientState();
+
+    /** Monitor router statistics for duplicate detection */
+    void checkForDuplicateStats();
+
+    // Duplicate detection via router statistics
+    uint32_t lastRxDupe = 0;
+    uint32_t lastTxRelayCanceled = 0;
 };
 
 extern RgbLedIndicatorModule *rgbLedIndicatorModule;
