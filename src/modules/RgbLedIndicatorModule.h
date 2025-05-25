@@ -4,7 +4,7 @@
 #include "configuration.h"
 
 #ifdef HAS_NEOPIXEL
-#include <Adafruit_NeoPixel.h>
+#include <graphics/NeoPixel.h>
 // Define NeoPixel constants if we have NeoPixel support
 #ifndef NEOPIXEL_TYPE_DEFAULT
 #define NEOPIXEL_TYPE_DEFAULT (NEO_GRB + NEO_KHZ800)
@@ -29,8 +29,8 @@
  * - Cyan: Serial and range test (SERIAL_APP, RANGE_TEST_APP)
  * - White: Unknown or other port numbers
  *
- * Uses NeoPixel/WS2812 addressable LEDs for better color control and easier wiring.
- * Only requires a single GPIO pin instead of three separate RGB pins.
+ * Uses the shared global NeoPixel object from AmbientLightingThread.
+ * Temporarily overrides ambient lighting when indicating packets.
  */
 class RgbLedIndicatorModule : public MeshModule, public concurrency::OSThread
 {
@@ -63,15 +63,12 @@ class RgbLedIndicatorModule : public MeshModule, public concurrency::OSThread
     bool ledActive = false;
     uint32_t ledOffTime = 0;
     uint32_t currentColor = 0;
-
-#ifdef HAS_NEOPIXEL
-    Adafruit_NeoPixel *pixels = nullptr;
-#endif
+    uint32_t savedAmbientColor = 0; // Store ambient color to restore later
 
     /** Set NeoPixel color (32-bit RGB color) */
     void setPixelColor(uint32_t color);
 
-    /** Turn off NeoPixel */
+    /** Turn off NeoPixel and restore ambient lighting */
     void turnOffLeds();
 
     /** Get 32-bit RGB color for a specific port number */
@@ -88,6 +85,12 @@ class RgbLedIndicatorModule : public MeshModule, public concurrency::OSThread
 
     /** Create 32-bit color from RGB values */
     uint32_t color(uint8_t r, uint8_t g, uint8_t b);
+
+    /** Save current ambient lighting state */
+    void saveAmbientState();
+
+    /** Restore ambient lighting state */
+    void restoreAmbientState();
 };
 
 extern RgbLedIndicatorModule *rgbLedIndicatorModule;

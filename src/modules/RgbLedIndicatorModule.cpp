@@ -103,20 +103,7 @@ int32_t RgbLedIndicatorModule::runOnce()
         if (numLeds < 1)
             numLeds = 1;
 
-#ifdef HAS_NEOPIXEL
-        // Initialize NeoPixel
-        pixels = new Adafruit_NeoPixel(numLeds, dataPin, pixelType);
-        if (pixels) {
-            pixels->begin();
-            pixels->setBrightness(brightness);
-            turnOffLeds();
-            pixels->show();
-        } else {
-            LOG_ERROR("Failed to create NeoPixel object");
-            return INT32_MAX;
-        }
-#endif
-
+        // Note: We don't initialize the pixels object here since it's managed by AmbientLightingThread
         LOG_INFO("NeoPixel Indicator Module initialized: Pin:%d, Count:%d, Blink:%dms, Brightness:%d", dataPin, numLeds,
                  blinkDuration, brightness);
 
@@ -143,11 +130,8 @@ int32_t RgbLedIndicatorModule::runOnce()
 ProcessMessage RgbLedIndicatorModule::handleReceived(const meshtastic_MeshPacket &mp)
 {
 #ifdef HAS_NEOPIXEL
-    // Only process if NeoPixel is available and initialized
-    if (!pixels) {
-        LOG_DEBUG("NeoPixel: Packet ignored - NeoPixel not initialized");
-        return ProcessMessage::CONTINUE;
-    }
+    // Using shared global pixels object - no need to check for null
+    LOG_DEBUG("NeoPixel: Using shared global pixels object");
 #else
     LOG_DEBUG("NeoPixel: Packet ignored - HAS_NEOPIXEL not defined");
     return ProcessMessage::CONTINUE;
@@ -208,29 +192,20 @@ bool RgbLedIndicatorModule::shouldAlertForPortNum(meshtastic_PortNum portnum)
 void RgbLedIndicatorModule::setPixelColor(uint32_t color)
 {
 #ifdef HAS_NEOPIXEL
-    if (pixels) {
-        LOG_DEBUG("NeoPixel: Setting %d LEDs to color 0x%06X", numLeds, color);
-        // Set all LEDs to the same color
-        for (int i = 0; i < numLeds; i++) {
-            pixels->setPixelColor(i, color);
-        }
-        pixels->show();
-    } else {
-        LOG_DEBUG("NeoPixel: Cannot set color - pixels object is null");
+    LOG_DEBUG("NeoPixel: Setting %d LEDs to color 0x%06X", numLeds, color);
+    // Set all LEDs to the same color using global pixels object
+    for (int i = 0; i < numLeds; i++) {
+        pixels.setPixelColor(i, color);
     }
+    pixels.show();
 #endif
 }
 
 void RgbLedIndicatorModule::turnOffLeds()
 {
 #ifdef HAS_NEOPIXEL
-    if (pixels) {
-        LOG_DEBUG("NeoPixel: Turning off all LEDs");
-        pixels->clear();
-        pixels->show();
-    } else {
-        LOG_DEBUG("NeoPixel: Cannot turn off LEDs - pixels object is null");
-    }
+    LOG_DEBUG("NeoPixel: Restoring ambient lighting");
+    restoreAmbientState();
 #endif
 }
 
@@ -287,6 +262,9 @@ void RgbLedIndicatorModule::triggerBlink(uint32_t color)
 {
     LOG_DEBUG("NeoPixel: Starting blink - Color: 0x%06X, Duration: %dms", color, blinkDuration);
 
+    // Save current ambient lighting state before overriding
+    saveAmbientState();
+
     // Store the color
     currentColor = color;
 
@@ -319,4 +297,25 @@ uint32_t RgbLedIndicatorModule::applyBrightness(uint32_t color, uint8_t brightne
 uint32_t RgbLedIndicatorModule::color(uint8_t r, uint8_t g, uint8_t b)
 {
     return ((uint32_t)r << 16) | ((uint32_t)g << 8) | b;
+}
+
+void RgbLedIndicatorModule::saveAmbientState()
+{
+#ifdef HAS_NEOPIXEL
+    // Get the current color from the first pixel (assuming all pixels have same ambient color)
+    savedAmbientColor = pixels.getPixelColor(0);
+    LOG_DEBUG("NeoPixel: Saved ambient color: 0x%06X", savedAmbientColor);
+#endif
+}
+
+void RgbLedIndicatorModule::restoreAmbientState()
+{
+#ifdef HAS_NEOPIXEL
+    // Restore the saved ambient color to all pixels
+    for (int i = 0; i < numLeds; i++) {
+        pixels.setPixelColor(i, savedAmbientColor);
+    }
+    pixels.show();
+    LOG_DEBUG("NeoPixel: Restored ambient color: 0x%06X", savedAmbientColor);
+#endif
 }
